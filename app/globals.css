@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-mint-50 text-slate-800;
+  font-family: "Arial", "Heebo", sans-serif;
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  @apply outline-none ring-2 ring-mint-500 ring-offset-2;
+}
