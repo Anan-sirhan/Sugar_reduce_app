@@ -1,6 +1,7 @@
 import { AppData } from "./types";
 
-export const STORAGE_KEY = "sugar_reduce_data_v1";
+export const STORAGE_KEY = "sugar_reduce_data_v2";
+const LEGACY_STORAGE_KEY = "sugar_reduce_data_v1";
 
 const now = new Date();
 const day = 24 * 60 * 60 * 1000;
@@ -41,23 +42,44 @@ const seededLogs = [
 ] as AppData["logs"];
 
 export const seedData: AppData = {
-  weeklyGoal: 9,
+  dailyGoal: 2,
+  weeklyGoal: 10,
   logs: seededLogs,
 };
+
+function normalizeData(raw: unknown): AppData {
+  if (!raw || typeof raw !== "object") {
+    return seedData;
+  }
+
+  const parsed = raw as Partial<AppData>;
+  const weeklyGoal = typeof parsed.weeklyGoal === "number" ? parsed.weeklyGoal : seedData.weeklyGoal;
+  const dailyGoal =
+    typeof parsed.dailyGoal === "number" ? parsed.dailyGoal : Math.max(1, Math.round(weeklyGoal / 7));
+
+  return {
+    dailyGoal,
+    weeklyGoal,
+    logs: Array.isArray(parsed.logs) ? parsed.logs : seedData.logs,
+  };
+}
 
 export function loadData(): AppData {
   if (typeof window === "undefined") {
     return seedData;
   }
 
-  const raw = window.localStorage.getItem(STORAGE_KEY);
+  const raw = window.localStorage.getItem(STORAGE_KEY) ?? window.localStorage.getItem(LEGACY_STORAGE_KEY);
   if (!raw) {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(seedData));
     return seedData;
   }
 
   try {
-    return JSON.parse(raw) as AppData;
+    const normalized = normalizeData(JSON.parse(raw));
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+    window.localStorage.removeItem(LEGACY_STORAGE_KEY);
+    return normalized;
   } catch {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(seedData));
     return seedData;
