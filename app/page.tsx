@@ -63,8 +63,8 @@ export default function Page() {
       hourCounter.set(hour, (hourCounter.get(hour) ?? 0) + 1);
     });
 
-    const mostCommonTrigger = [...reasonCounter.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "habit";
-    const mostCommonHour = [...hourCounter.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
+    const mostCommonTrigger = Array.from(reasonCounter.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "habit";
+    const mostCommonHour = Array.from(hourCounter.entries()).sort((a, b) => b[1] - a[1])[0]?.[0];
 
     let streak = 0;
     for (let i = last7.length - 1; i >= 0; i -= 1) {
