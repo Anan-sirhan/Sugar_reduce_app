@@ -1,2 +1,12 @@
-# Sugar_reduce_app
-A simple Hebrew web app to help reduce candy and sugar intake gradually
+# Sugar Reduce App
+
+אפליקציית Next.js + Tailwind להפחתה הדרגתית בצריכת ממתקים, עם ממשק בעברית, תמיכה ב-RTL ושמירה מקומית ב-localStorage.
+
+## הפעלה
+
+```bash
+npm install
+npm run dev
+```
+
+פתחו את http://localhost:3000.
