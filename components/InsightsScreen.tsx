@@ -17,21 +17,21 @@ export default function InsightsScreen({
 
   return (
     <div className="space-y-4">
-      <Card title="תובנות">
+      <Card title="תובנות שבועיות">
         <div className="space-y-2 text-sm text-slate-700">
           <p>
-            טריגר נפוץ: <strong>{mostCommonTrigger}</strong>
+            מה הכי מפעיל את החשק לאחרונה: <strong>{mostCommonTrigger}</strong>
           </p>
           <p>
-            שעה נפוצה: <strong>{mostCommonHour}</strong>
+            השעה הנפוצה ביותר: <strong>{mostCommonHour}</strong>
           </p>
           <p>
-            רצף ימים מתחת ליעד: <strong>{streakUnderGoal}</strong>
+            רצף הימים מתחת ליעד: <strong>{streakUnderGoal}</strong>
           </p>
         </div>
       </Card>
 
-      <Card title="שבוע אחרון">
+      <Card title="מבט על 7 הימים האחרונים">
         <div className="space-y-2">
           {dailyCounts.map((item) => (
             <div key={item.dayLabel} className="flex items-center gap-2 text-sm">

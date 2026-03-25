@@ -11,6 +11,12 @@ body {
   font-family: "Arial", "Heebo", sans-serif;
 }
 
+button,
+input,
+select {
+  font-size: 16px;
+}
+
 button:focus-visible,
 select:focus-visible,
 input:focus-visible {

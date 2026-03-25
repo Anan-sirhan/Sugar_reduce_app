@@ -1,12 +1,12 @@
-import { FormEvent, useState } from "react";
-import { SweetReason } from "@/lib/types";
+import { FormEvent, useMemo, useState } from "react";
+import { SweetLog, SweetReason } from "@/lib/types";
 
 const reasons: { value: SweetReason; label: string }[] = [
   { value: "hunger", label: "רעב" },
-  { value: "stress", label: "לחץ" },
+  { value: "stress", label: "סטרס" },
   { value: "boredom", label: "שעמום" },
   { value: "habit", label: "הרגל" },
-  { value: "social", label: "חברתי" },
+  { value: "social", label: "אירוע חברתי" },
 ];
 
 type FormValues = {
@@ -19,17 +19,33 @@ type FormValues = {
 
 type QuickLogFormProps = {
   onSubmit: (values: FormValues) => void;
+  initialValues?: Partial<SweetLog>;
+  onCancel?: () => void;
+  submitText?: string;
 };
 
-export default function QuickLogForm({ onSubmit }: QuickLogFormProps) {
-  const defaultTime = new Date().toISOString().slice(0, 16);
-  const [form, setForm] = useState<FormValues>({
-    whatAte: "",
-    time: defaultTime,
-    reason: "hunger",
-    cravingLevel: 3,
-    physicallyHungry: false,
-  });
+const defaultTime = new Date().toISOString().slice(0, 16);
+
+export default function QuickLogForm({
+  onSubmit,
+  initialValues,
+  onCancel,
+  submitText = "שמירה",
+}: QuickLogFormProps) {
+  const initialState = useMemo<FormValues>(
+    () => ({
+      whatAte: initialValues?.whatAte ?? "",
+      time: initialValues?.time
+        ? new Date(initialValues.time).toISOString().slice(0, 16)
+        : defaultTime,
+      reason: initialValues?.reason ?? "hunger",
+      cravingLevel: initialValues?.cravingLevel ?? 3,
+      physicallyHungry: initialValues?.physicallyHungry ?? false,
+    }),
+    [initialValues],
+  );
+
+  const [form, setForm] = useState<FormValues>(initialState);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -38,40 +54,42 @@ export default function QuickLogForm({ onSubmit }: QuickLogFormProps) {
     }
 
     onSubmit(form);
-    setForm((prev) => ({ ...prev, whatAte: "" }));
+    if (!initialValues?.id) {
+      setForm((prev) => ({ ...prev, whatAte: "" }));
+    }
   };
 
   return (
-    <form className="space-y-3" onSubmit={handleSubmit}>
+    <form className="space-y-4" onSubmit={handleSubmit}>
       <label className="block text-sm">
-        <span className="mb-1 block text-slate-600">מה אכלתי</span>
+        <span className="mb-1.5 block text-slate-600">מה בחרתי לאכול?</span>
         <input
           required
           value={form.whatAte}
           onChange={(event) => setForm((prev) => ({ ...prev, whatAte: event.target.value }))}
-          className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2"
+          className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5"
           placeholder="לדוגמה: שוקולד קטן"
         />
       </label>
 
       <label className="block text-sm">
-        <span className="mb-1 block text-slate-600">שעה</span>
+        <span className="mb-1.5 block text-slate-600">מתי זה קרה?</span>
         <input
           type="datetime-local"
           value={form.time}
           onChange={(event) => setForm((prev) => ({ ...prev, time: event.target.value }))}
-          className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2"
+          className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5"
         />
       </label>
 
       <label className="block text-sm">
-        <span className="mb-1 block text-slate-600">סיבה</span>
+        <span className="mb-1.5 block text-slate-600">מה הכי תיאר את הרגע?</span>
         <select
           value={form.reason}
           onChange={(event) =>
             setForm((prev) => ({ ...prev, reason: event.target.value as SweetReason }))
           }
-          className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2"
+          className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5"
         >
           {reasons.map((reason) => (
             <option key={reason.value} value={reason.value}>
@@ -82,14 +100,17 @@ export default function QuickLogForm({ onSubmit }: QuickLogFormProps) {
       </label>
 
       <label className="block text-sm">
-        <span className="mb-1 block text-slate-600">רמת חשק 1-5</span>
+        <span className="mb-1.5 block text-slate-600">רמת החשק (1-5)</span>
         <input
           type="range"
           min={1}
           max={5}
           value={form.cravingLevel}
           onChange={(event) =>
-            setForm((prev) => ({ ...prev, cravingLevel: Number(event.target.value) as FormValues["cravingLevel"] }))
+            setForm((prev) => ({
+              ...prev,
+              cravingLevel: Number(event.target.value) as FormValues["cravingLevel"],
+            }))
           }
           className="w-full"
         />
@@ -97,9 +118,9 @@ export default function QuickLogForm({ onSubmit }: QuickLogFormProps) {
       </label>
 
       <fieldset className="text-sm">
-        <legend className="mb-1 text-slate-600">האם הייתי רעב/ה פיזית?</legend>
-        <div className="flex gap-3">
-          <label className="flex items-center gap-2">
+        <legend className="mb-2 text-slate-600">האם היה רעב פיזי?</legend>
+        <div className="grid grid-cols-2 gap-2">
+          <label className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-3 py-2">
             <input
               type="radio"
               checked={form.physicallyHungry}
@@ -107,7 +128,7 @@ export default function QuickLogForm({ onSubmit }: QuickLogFormProps) {
             />
             כן
           </label>
-          <label className="flex items-center gap-2">
+          <label className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-3 py-2">
             <input
               type="radio"
               checked={!form.physicallyHungry}
@@ -118,9 +139,20 @@ export default function QuickLogForm({ onSubmit }: QuickLogFormProps) {
         </div>
       </fieldset>
 
-      <button className="w-full rounded-xl bg-mint-500 px-4 py-3 font-semibold text-white">
-        שמירה
-      </button>
+      <div className="grid grid-cols-2 gap-2">
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="rounded-xl bg-white px-4 py-3 font-semibold text-slate-600 ring-1 ring-slate-200"
+          >
+            ביטול
+          </button>
+        )}
+        <button className="rounded-xl bg-mint-500 px-4 py-3 font-semibold text-white">
+          {submitText}
+        </button>
+      </div>
     </form>
   );
 }

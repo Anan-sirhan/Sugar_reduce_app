@@ -10,6 +10,7 @@ export type SweetLog = {
 };
 
 export type AppData = {
+  dailyGoal: number;
   weeklyGoal: number;
   logs: SweetLog[];
 };
